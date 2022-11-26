@@ -23,7 +23,7 @@ func WithEndpoint(endpoint string) ClientOption {
 // WithUnaryInterceptor returns a DialOption that specifies the interceptor for unary RPCs.
 func WithUnaryInterceptor(in ...grpc.UnaryClientInterceptor) ClientOption {
 	return func(o *clientOptions) {
-		o.ints = in
+		o.interceptors = in
 	}
 }
 
@@ -34,6 +34,7 @@ func WithOptions(opts ...grpc.DialOption) ClientOption {
 	}
 }
 
+// WithTracing trace
 func WithTracing(opt bool) ClientOption {
 	return func(o *clientOptions) {
 		o.tracing = opt
@@ -42,11 +43,10 @@ func WithTracing(opt bool) ClientOption {
 
 // clientOptions is gRPC Client
 type clientOptions struct {
-	endpoint string
-	ints     []grpc.UnaryClientInterceptor
-	grpcOpts []grpc.DialOption
-
-	tracing bool
+	endpoint     string
+	interceptors []grpc.UnaryClientInterceptor
+	grpcOpts     []grpc.DialOption
+	tracing      bool
 }
 
 // Dial returns a GRPC connection.
@@ -64,32 +64,25 @@ func dial(ctx context.Context, insecure bool, opts ...ClientOption) (*grpc.Clien
 	for _, o := range opts {
 		o(&options)
 	}
-
 	var unaryInterceptors []grpc.UnaryClientInterceptor
 	var streamInterceptors []grpc.StreamClientInterceptor
-
-	if len(options.ints) > 0 {
-		unaryInterceptors = append(unaryInterceptors, options.ints...)
+	if len(options.interceptors) > 0 {
+		unaryInterceptors = append(unaryInterceptors, options.interceptors...)
 	}
-
 	if options.tracing {
 		unaryInterceptors = append(unaryInterceptors, otelgrpc.UnaryClientInterceptor())
 		streamInterceptors = append(streamInterceptors, otelgrpc.StreamClientInterceptor())
 	}
-
 	grpcOpts := []grpc.DialOption{
 		grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"LoadBalancingPolicy": %q}`, roundrobin.Name)),
 		grpc.WithChainUnaryInterceptor(unaryInterceptors...),
 		grpc.WithChainStreamInterceptor(streamInterceptors...),
 	}
-
 	if insecure {
-		// grpc.WithInsecure()
 		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(grpcInsecure.NewCredentials()))
 	}
 	if len(options.grpcOpts) > 0 {
 		grpcOpts = append(grpcOpts, options.grpcOpts...)
 	}
-
 	return grpc.DialContext(ctx, options.endpoint, grpcOpts...)
 }

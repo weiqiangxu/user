@@ -13,7 +13,7 @@ func ExtractHostPort(addr string) (host string, port uint64, err error) {
 	if err != nil {
 		return
 	}
-	port, err = strconv.ParseUint(ports, 10, 16) //nolint:gomnd
+	port, err = strconv.ParseUint(ports, 10, 16)
 	if err != nil {
 		return
 	}
@@ -49,26 +49,26 @@ func Extract(hostPort string, lis net.Listener) (string, error) {
 	if len(addr) > 0 && (addr != "0.0.0.0" && addr != "[::]" && addr != "::") {
 		return net.JoinHostPort(addr, port), nil
 	}
-	ifaces, err := net.Interfaces()
+	interfaces, err := net.Interfaces()
 	if err != nil {
 		return "", err
 	}
 	lowest := int(^uint(0) >> 1)
 	var result net.IP
-	for _, iface := range ifaces {
-		if (iface.Flags & net.FlagUp) == 0 {
+	for _, i := range interfaces {
+		if (i.Flags & net.FlagUp) == 0 {
 			continue
 		}
-		if iface.Index < lowest || result == nil {
-			lowest = iface.Index
+		if i.Index < lowest || result == nil {
+			lowest = i.Index
 		} else if result != nil {
 			continue
 		}
-		addrs, err := iface.Addrs()
+		adders, err := i.Addrs()
 		if err != nil {
 			continue
 		}
-		for _, rawAddr := range addrs {
+		for _, rawAddr := range adders {
 			var ip net.IP
 			switch addr := rawAddr.(type) {
 			case *net.IPAddr:

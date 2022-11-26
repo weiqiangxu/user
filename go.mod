@@ -11,7 +11,7 @@ require (
 	github.com/prometheus/client_golang v1.14.0
 	github.com/segmentio/ksuid v1.0.4
 	github.com/weiqiangxu/common-config v0.0.0-20221126045525-c1f355112184
-	github.com/weiqiangxu/protocol v0.0.0-20221126022518-24a0b9f6b034
+	github.com/weiqiangxu/protocol v0.0.0-20221126155733-7657bc0121fc
 	go.mongodb.org/mongo-driver v1.11.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.28.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0

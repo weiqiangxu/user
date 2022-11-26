@@ -2,10 +2,11 @@ package http
 
 import (
 	"context"
-	"github.com/weiqiangxu/user/config"
-	"github.com/weiqiangxu/user/infra/transport"
 	"net/http"
 	"time"
+
+	"github.com/weiqiangxu/user/config"
+	"github.com/weiqiangxu/user/net/transport"
 
 	"github.com/weiqiangxu/common-config/logger"
 
@@ -91,7 +92,7 @@ func NewServer(opts ...ServerOption) *Server {
 		ginPprof.Register(g)
 	}
 	if srv.tracing {
-		g.Use(otelgin.Middleware(config.Conf.Application.DataId))
+		g.Use(otelgin.Middleware(config.Conf.Application.Name))
 	}
 	if len(srv.ms) > 0 {
 		g.Use(srv.ms...)
@@ -114,9 +115,6 @@ func (s *Server) Server() *gin.Engine {
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	/*if _, err := s.Endpoint(); err != nil {
-		return err
-	}*/
 	srv := &http.Server{
 		Addr:    s.address,
 		Handler: s.gin,

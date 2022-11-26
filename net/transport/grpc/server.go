@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/weiqiangxu/common-config/logger"
-	"github.com/weiqiangxu/user/infra/internal/host"
-	"github.com/weiqiangxu/user/infra/transport"
+	"github.com/weiqiangxu/user/net/internal/host"
+	"github.com/weiqiangxu/user/net/transport"
 
 	grpcRecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -68,8 +68,8 @@ func NewServer(opts ...ServerOption) *Server {
 	for _, o := range opts {
 		o(srv)
 	}
-	unaryInterceptors := []grpc.UnaryServerInterceptor{}
-	streamInterceptors := []grpc.StreamServerInterceptor{}
+	var unaryInterceptors []grpc.UnaryServerInterceptor
+	var streamInterceptors []grpc.StreamServerInterceptor
 	if len(srv.interceptor) > 0 {
 		unaryInterceptors = append(unaryInterceptors, srv.interceptor...)
 	}
@@ -88,12 +88,10 @@ func NewServer(opts ...ServerOption) *Server {
 		unaryInterceptors = append(unaryInterceptors, grpcRecovery.UnaryServerInterceptor(grpcRecoveryOpts...))
 		streamInterceptors = append(streamInterceptors, grpcRecovery.StreamServerInterceptor(grpcRecoveryOpts...))
 	}
-
 	if srv.tracing {
 		unaryInterceptors = append(unaryInterceptors, otelgrpc.UnaryServerInterceptor())
 		streamInterceptors = append(streamInterceptors, otelgrpc.StreamServerInterceptor())
 	}
-
 	grpcOpts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(unaryInterceptors...),
 		grpc.ChainStreamInterceptor(streamInterceptors...),
@@ -101,13 +99,28 @@ func NewServer(opts ...ServerOption) *Server {
 	if len(srv.grpcOpts) > 0 {
 		grpcOpts = append(grpcOpts, srv.grpcOpts...)
 	}
-
 	srv.Server = grpc.NewServer(grpcOpts...)
-
 	srv.health.SetServingStatus(HealthcheckService, grpc_health_v1.HealthCheckResponse_SERVING)
 	grpc_health_v1.RegisterHealthServer(srv.Server, srv.health)
 	reflection.Register(srv.Server)
 	return srv
+}
+
+func (s *Server) Start(ctx context.Context) error {
+	if _, err := s.Endpoint(); err != nil {
+		return err
+	}
+	s.ctx = ctx
+	logger.Infof("[gRPC] server listening on: %s", s.listener.Addr().String())
+	s.health.Resume()
+	return s.Serve(s.listener)
+}
+
+func (s *Server) Stop(ctx context.Context) error {
+	s.GracefulStop()
+	s.health.Shutdown()
+	logger.Info("[gRPC] server stopping")
+	return nil
 }
 
 // Endpoint return a real address to registry endpoint.
@@ -134,21 +147,4 @@ func (s *Server) Endpoint() (*url.URL, error) {
 		return nil, s.err
 	}
 	return s.endpoint, nil
-}
-
-func (s *Server) Start(ctx context.Context) error {
-	if _, err := s.Endpoint(); err != nil {
-		return err
-	}
-	s.ctx = ctx
-	logger.Infof("[gRPC] server listening on: %s", s.listener.Addr().String())
-	s.health.Resume()
-	return s.Serve(s.listener)
-}
-
-func (s *Server) Stop(ctx context.Context) error {
-	s.GracefulStop()
-	s.health.Shutdown()
-	logger.Info("[gRPC] server stopping")
-	return nil
 }

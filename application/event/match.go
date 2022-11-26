@@ -2,8 +2,9 @@ package event
 
 import (
 	"context"
-	"github.com/weiqiangxu/user/infra/transport"
 	"time"
+
+	"github.com/weiqiangxu/user/net/transport"
 
 	"github.com/weiqiangxu/common-config/logger"
 )

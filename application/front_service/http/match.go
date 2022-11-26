@@ -1,7 +1,10 @@
 package http
 
 import (
+	"github.com/weiqiangxu/user/application/front_service/dtos"
 	"net/http"
+
+	"github.com/weiqiangxu/protocol/order"
 
 	"github.com/gin-gonic/gin"
 	"github.com/weiqiangxu/user/domain/user"
@@ -15,8 +18,15 @@ func WithUserDomainService(t user.DomainInterface) UserAppHttpOption {
 	}
 }
 
+func WithOrderRpcClient(t order.OrderClient) UserAppHttpOption {
+	return func(service *UserAppHttpService) {
+		service.orderRpcClient = t
+	}
+}
+
 type UserAppHttpService struct {
-	userDomainSrv user.DomainInterface
+	userDomainSrv  user.DomainInterface
+	orderRpcClient order.OrderClient
 }
 
 func NewUserAppHttpService(options ...UserAppHttpOption) *UserAppHttpService {
@@ -30,5 +40,8 @@ func NewUserAppHttpService(options ...UserAppHttpOption) *UserAppHttpService {
 // GetUserList get user list
 func (m *UserAppHttpService) GetUserList(c *gin.Context) {
 	info, _ := m.userDomainSrv.GetUserInfo(10)
-	c.JSON(http.StatusOK, info)
+	dto := &dtos.UserDto{
+		Name: info.Name,
+	}
+	c.JSON(http.StatusOK, dto)
 }

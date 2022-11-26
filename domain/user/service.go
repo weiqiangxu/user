@@ -38,5 +38,7 @@ func NewUserService(options ...MainLogicOption) DomainInterface {
 }
 
 func (m *MainLogic) GetUserInfo(id int) (*entity.UserDo, error) {
-	return &entity.UserDo{}, nil
+	return &entity.UserDo{
+		Name: "i am jack",
+	}, nil
 }

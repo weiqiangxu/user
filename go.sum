@@ -343,6 +343,8 @@ github.com/weiqiangxu/common-config v0.0.0-20221126045525-c1f355112184 h1:RzUabr
 github.com/weiqiangxu/common-config v0.0.0-20221126045525-c1f355112184/go.mod h1:MTrl0v+p9naKDlEejQdDiXrpKtgsEigoveh+Vrl8F5I=
 github.com/weiqiangxu/protocol v0.0.0-20221126022518-24a0b9f6b034 h1:2Q/3EJNwqnjsBYxXIGASr+UqpfuHGhR+I/fBu+P4jM0=
 github.com/weiqiangxu/protocol v0.0.0-20221126022518-24a0b9f6b034/go.mod h1:4W30wNetQqctSec9iwewhBeFA1aebL+gY78RC0fk4uI=
+github.com/weiqiangxu/protocol v0.0.0-20221126155733-7657bc0121fc h1:buD4YOiD41GpkSTZ8kJ6igYB/y4xfUT4enMq9LAUPs0=
+github.com/weiqiangxu/protocol v0.0.0-20221126155733-7657bc0121fc/go.mod h1:4W30wNetQqctSec9iwewhBeFA1aebL+gY78RC0fk4uI=
 github.com/xdg-go/pbkdf2 v1.0.0 h1:Su7DPu48wXMwC3bs7MCNG+z4FhcyEuz5dlvchbq0B0c=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.1.1 h1:VOMT+81stJgXW3CpHyqHN3AXDYIMsx56mEFrB37Mb/E=

@@ -1,13 +1,17 @@
 package application
 
 import (
+	"context"
 	"time"
+
+	"github.com/weiqiangxu/protocol/order"
+	"github.com/weiqiangxu/user/net/transport/grpc"
 
 	redisApi "github.com/weiqiangxu/common-config/cache"
 	"github.com/weiqiangxu/common-config/logger"
 	"github.com/weiqiangxu/user/config"
 	"github.com/weiqiangxu/user/domain/user"
-	"github.com/weiqiangxu/user/infra/transport"
+	"github.com/weiqiangxu/user/net/transport"
 
 	adminGrpc "github.com/weiqiangxu/user/application/admin_service/grpc"
 	"github.com/weiqiangxu/user/application/event"
@@ -31,24 +35,23 @@ type adminService struct {
 }
 
 func Init() {
-	// 在这里将领域驱动对象注入
+	// connect order rpc server to create order grpc client
+	OrderGrpc, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint(config.Conf.OrderGrpcConfig.Addr), grpc.WithTracing(true))
+	if err != nil {
+		logger.Fatal(err)
+	}
+	orderGrpcClient := order.NewOrderClient(OrderGrpc)
+	// inject rpc client && redis into domain service
 	redis := redisApi.NewRedisApi(config.Conf.WikiRedisDb)
 	userDomain := user.NewUserService(user.WithRedis(redis))
 	frontSrv := &frontService{}
 	frontSrv.UserHttp = frontHttp.NewUserAppHttpService(
 		frontHttp.WithUserDomainService(userDomain),
+		frontHttp.WithOrderRpcClient(orderGrpcClient),
 	)
 	adminSrv := &adminService{}
 	adminSrv.UserGrpcService = adminGrpc.NewUserAppGrpcService()
-
-	// 将生成好的rpc客户端注入service那么service就可以使用这个rpc拉取数据
-	//UserLogicGrpc, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint(config.Conf.UserGrpcConfig.Addr))
-	//if err != nil {
-	//	logger.Fatal(err)
-	//}
-	//userLoginGrpcClient := user.NewLoginClient(UserLogicGrpc)
-
-	// 注入定时任务
+	// inject cron event of match
 	matchEvent := event.NewMatchEvent(
 		event.WithTicker(time.NewTicker(time.Second*30)),
 		event.WithMatchCronAction(func() error {

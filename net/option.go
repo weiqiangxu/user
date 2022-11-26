@@ -1,10 +1,10 @@
-package infra
+package net
 
 import (
 	"context"
 	"os"
 
-	"github.com/weiqiangxu/user/infra/transport"
+	"github.com/weiqiangxu/user/net/transport"
 )
 
 // Option is an application option.
