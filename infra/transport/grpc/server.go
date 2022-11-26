@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"code.skyhorn.net/backend/infra/gms/internal/host"
-	"code.skyhorn.net/backend/infra/gms/transport"
-	"code.skyhorn.net/backend/infra/logger"
+	"github.com/weiqiangxu/common-config/logger"
+	"github.com/weiqiangxu/user/infra/internal/host"
+	"github.com/weiqiangxu/user/infra/transport"
 
 	grpcRecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -23,7 +23,7 @@ import (
 
 var _ transport.Server = (*Server)(nil)
 
-const HEALTHCHECK_SERVICE = "grpc.health.v1.Health"
+const HealthcheckService = "grpc.health.v1.Health"
 
 type ServerOption func(o *Server)
 
@@ -104,7 +104,7 @@ func NewServer(opts ...ServerOption) *Server {
 
 	srv.Server = grpc.NewServer(grpcOpts...)
 
-	srv.health.SetServingStatus(HEALTHCHECK_SERVICE, grpc_health_v1.HealthCheckResponse_SERVING)
+	srv.health.SetServingStatus(HealthcheckService, grpc_health_v1.HealthCheckResponse_SERVING)
 	grpc_health_v1.RegisterHealthServer(srv.Server, srv.health)
 	reflection.Register(srv.Server)
 	return srv
@@ -112,7 +112,8 @@ func NewServer(opts ...ServerOption) *Server {
 
 // Endpoint return a real address to registry endpoint.
 // examples:
-//   grpc://127.0.0.1:9000?isSecure=false
+//
+//	grpc://127.0.0.1:9000?isSecure=false
 func (s *Server) Endpoint() (*url.URL, error) {
 	s.once.Do(func() {
 		lis, err := net.Listen(s.network, s.address)

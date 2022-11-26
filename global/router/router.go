@@ -1,21 +1,19 @@
 package router
 
 import (
-	commonMetrics "code.skyhorn.net/backend/common/metrics"
-	ginMiddleware "code.skyhorn.net/backend/infra/gin-middleware"
-	"code.skyhorn.net/backend/wiki-service/application"
-	"code.skyhorn.net/backend/wiki-service/config"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/weiqiangxu/common-config/metrics"
+	"github.com/weiqiangxu/user/application"
+	"github.com/weiqiangxu/user/config"
 )
 
 func Init(r *gin.Engine) {
-	jwtHandle := ginMiddleware.JWT([]byte(config.Conf.JwtConfig.Secret))
-	monitorHandle := commonMetrics.RequestMonitor()
+	monitorHandle := metrics.RequestMonitor()
 	r.Use(monitorHandle)
 	game := r.Group("/user")
 	{
-		game.GET("/list", jwtHandle, application.App.FrontService.UserHttp.GetUserList)
+		game.GET("/list", application.App.FrontService.UserHttp.GetUserList)
 	}
 }
 
@@ -24,6 +22,6 @@ func RegisterPrometheus() {
 	if !config.Conf.HttpConfig.Prometheus {
 		return
 	}
-	prometheus.MustRegister(commonMetrics.RequestLatencyHistogram)
-	prometheus.MustRegister(commonMetrics.RequestGauge)
+	prometheus.MustRegister(metrics.RequestLatencyHistogram)
+	prometheus.MustRegister(metrics.RequestGauge)
 }

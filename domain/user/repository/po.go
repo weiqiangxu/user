@@ -1,6 +1,6 @@
 package repository
 
-import "code.skyhorn.net/backend/wiki-service/domain/user/entity"
+import "github.com/weiqiangxu/user/domain/user/entity"
 
 // UserPo 仓储层模型，此时的updateTime是MySQL自带的字段模型对领域层而言是不需要的是无意义的
 // 比如有一个字段模型是 is_deleted 是表示数据已经被删掉了，那么这个字段对于MySQL是可见的

@@ -1,9 +1,9 @@
 package user
 
 import (
-	"code.skyhorn.net/backend/wiki-service/domain/user/entity"
-	"code.skyhorn.net/backend/wiki-service/domain/user/repository"
 	redisApi "github.com/weiqiangxu/common-config/cache"
+	"github.com/weiqiangxu/user/domain/user/entity"
+	"github.com/weiqiangxu/user/domain/user/repository"
 )
 
 type DomainInterface interface {

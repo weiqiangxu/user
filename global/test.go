@@ -1,6 +1,6 @@
 package global
 
-import "code.skyhorn.net/backend/wiki-service/config"
+import "github.com/weiqiangxu/user/config"
 
 // SetupDev dev环境配置注入 用于单元测试配置注入
 func SetupDev() {

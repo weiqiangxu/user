@@ -1,9 +1,10 @@
 package http
 
 import (
-	"code.skyhorn.net/backend/wiki-service/domain/user"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
-	"github.com/weiqiangxu/common-config"
+	"github.com/weiqiangxu/user/domain/user"
 )
 
 type UserAppHttpOption func(service *UserAppHttpService)
@@ -29,5 +30,5 @@ func NewUserAppHttpService(options ...UserAppHttpOption) *UserAppHttpService {
 // GetUserList get user list
 func (m *UserAppHttpService) GetUserList(c *gin.Context) {
 	info, _ := m.userDomainSrv.GetUserInfo(10)
-	common.ResponseSuccess(c, info)
+	c.JSON(http.StatusOK, info)
 }

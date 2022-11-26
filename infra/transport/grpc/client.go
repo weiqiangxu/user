@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/balancer/roundrobin"
-	grpc_insecure "google.golang.org/grpc/credentials/insecure"
+	grpcInsecure "google.golang.org/grpc/credentials/insecure"
 )
 
 // ClientOption is gRPC client option.
@@ -65,8 +65,8 @@ func dial(ctx context.Context, insecure bool, opts ...ClientOption) (*grpc.Clien
 		o(&options)
 	}
 
-	unaryInterceptors := []grpc.UnaryClientInterceptor{}
-	streamInterceptors := []grpc.StreamClientInterceptor{}
+	var unaryInterceptors []grpc.UnaryClientInterceptor
+	var streamInterceptors []grpc.StreamClientInterceptor
 
 	if len(options.ints) > 0 {
 		unaryInterceptors = append(unaryInterceptors, options.ints...)
@@ -85,7 +85,7 @@ func dial(ctx context.Context, insecure bool, opts ...ClientOption) (*grpc.Clien
 
 	if insecure {
 		// grpc.WithInsecure()
-		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(grpc_insecure.NewCredentials()))
+		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(grpcInsecure.NewCredentials()))
 	}
 	if len(options.grpcOpts) > 0 {
 		grpcOpts = append(grpcOpts, options.grpcOpts...)

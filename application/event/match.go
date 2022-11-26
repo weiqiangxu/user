@@ -2,10 +2,10 @@ package event
 
 import (
 	"context"
+	"github.com/weiqiangxu/user/infra/transport"
 	"time"
 
-	"code.skyhorn.net/backend/infra/gms/transport"
-	"code.skyhorn.net/backend/infra/logger"
+	"github.com/weiqiangxu/common-config/logger"
 )
 
 var _ transport.Server = (*MatchEvent)(nil)

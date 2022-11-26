@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"code.skyhorn.net/backend/wiki-service/domain/user/entity"
+	"github.com/weiqiangxu/user/domain/user/entity"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )

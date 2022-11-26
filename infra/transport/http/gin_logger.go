@@ -9,7 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"code.skyhorn.net/backend/infra/logger"
+	"github.com/weiqiangxu/common-config/logger"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,8 +20,8 @@ type GinLoggerConfig struct {
 	SkipPaths  []string
 }
 
-// GinzapWithConfig returns a gin.HandlerFunc using configs
-func GinzapWithConfig(conf *GinLoggerConfig) gin.HandlerFunc {
+// GinZapWithConfig returns a gin.HandlerFunc using configs
+func GinZapWithConfig(conf *GinLoggerConfig) gin.HandlerFunc {
 	skipPaths := make(map[string]bool, len(conf.SkipPaths))
 	for _, path := range conf.SkipPaths {
 		skipPaths[path] = true
