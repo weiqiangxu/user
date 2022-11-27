@@ -4,18 +4,16 @@ import (
 	"context"
 	"time"
 
-	"github.com/weiqiangxu/protocol/order"
-	"github.com/weiqiangxu/user/net/transport/grpc"
-
 	redisApi "github.com/weiqiangxu/common-config/cache"
 	"github.com/weiqiangxu/common-config/logger"
-	"github.com/weiqiangxu/user/config"
-	"github.com/weiqiangxu/user/domain/user"
-	"github.com/weiqiangxu/user/net/transport"
-
+	"github.com/weiqiangxu/net/transport"
+	"github.com/weiqiangxu/net/transport/grpc"
+	"github.com/weiqiangxu/protocol/order"
 	adminGrpc "github.com/weiqiangxu/user/application/admin_service/grpc"
 	"github.com/weiqiangxu/user/application/event"
 	frontHttp "github.com/weiqiangxu/user/application/front_service/http"
+	"github.com/weiqiangxu/user/config"
+	"github.com/weiqiangxu/user/domain/user"
 )
 
 var App app

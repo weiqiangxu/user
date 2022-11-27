@@ -38,6 +38,9 @@ func NewUserService(options ...MainLogicOption) DomainInterface {
 }
 
 func (m *MainLogic) GetUserInfo(id int) (*entity.UserDo, error) {
+	if true {
+		panic("hhh")
+	}
 	return &entity.UserDo{
 		Name: "i am jack",
 	}, nil

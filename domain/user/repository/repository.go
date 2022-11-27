@@ -36,6 +36,9 @@ type userRepository struct {
 // GetUserInfo 获取用户个人信息
 func (r *userRepository) GetUserInfo(ctx context.Context, id int) (*entity.UserDo, error) {
 	po := getDataFromMySQL(ctx, id)
+	if true {
+		panic("123")
+	}
 	return po.do(), nil
 }
 

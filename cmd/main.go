@@ -3,14 +3,14 @@ package main
 import (
 	"github.com/weiqiangxu/common-config/format"
 	"github.com/weiqiangxu/common-config/logger"
+	"github.com/weiqiangxu/net"
+	"github.com/weiqiangxu/net/transport"
+	"github.com/weiqiangxu/net/transport/grpc"
+	"github.com/weiqiangxu/net/transport/http"
 	"github.com/weiqiangxu/protocol/user"
 	"github.com/weiqiangxu/user/application"
 	"github.com/weiqiangxu/user/config"
 	"github.com/weiqiangxu/user/global/router"
-	"github.com/weiqiangxu/user/net"
-	"github.com/weiqiangxu/user/net/transport"
-	"github.com/weiqiangxu/user/net/transport/grpc"
-	"github.com/weiqiangxu/user/net/transport/http"
 )
 
 func main() {
