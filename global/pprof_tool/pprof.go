@@ -1,9 +1,8 @@
-package pprof
+package pprof_tool
 
 import (
-	"net/http/pprof"
-
 	"github.com/gin-gonic/gin"
+	netPprof "net/http/pprof"
 )
 
 const (
@@ -31,17 +30,17 @@ func RouteRegister(route *gin.RouterGroup, prefixOptions ...string) {
 	prefix := getPrefix(prefixOptions...)
 	prefixRouter := route.Group(prefix)
 	{
-		prefixRouter.GET("/", gin.WrapF(pprof.Index))
-		prefixRouter.GET("/cmdline", gin.WrapF(pprof.Cmdline))
-		prefixRouter.GET("/profile", gin.WrapF(pprof.Profile))
-		prefixRouter.POST("/symbol", gin.WrapF(pprof.Symbol))
-		prefixRouter.GET("/symbol", gin.WrapF(pprof.Symbol))
-		prefixRouter.GET("/trace", gin.WrapF(pprof.Trace))
-		prefixRouter.GET("/allocs", gin.WrapH(pprof.Handler("allocs")))
-		prefixRouter.GET("/block", gin.WrapH(pprof.Handler("block")))
-		prefixRouter.GET("/goroutine", gin.WrapH(pprof.Handler("goroutine")))
-		prefixRouter.GET("/heap", gin.WrapH(pprof.Handler("heap")))
-		prefixRouter.GET("/mutex", gin.WrapH(pprof.Handler("mutex")))
-		prefixRouter.GET("/threadcreate", gin.WrapH(pprof.Handler("threadcreate")))
+		prefixRouter.GET("/", gin.WrapF(netPprof.Index))
+		prefixRouter.GET("/cmdline", gin.WrapF(netPprof.Cmdline))
+		prefixRouter.GET("/profile", gin.WrapF(netPprof.Profile))
+		prefixRouter.POST("/symbol", gin.WrapF(netPprof.Symbol))
+		prefixRouter.GET("/symbol", gin.WrapF(netPprof.Symbol))
+		prefixRouter.GET("/trace", gin.WrapF(netPprof.Trace))
+		prefixRouter.GET("/allocs", gin.WrapH(netPprof.Handler("allocs")))
+		prefixRouter.GET("/block", gin.WrapH(netPprof.Handler("block")))
+		prefixRouter.GET("/goroutine", gin.WrapH(netPprof.Handler("goroutine")))
+		prefixRouter.GET("/heap", gin.WrapH(netPprof.Handler("heap")))
+		prefixRouter.GET("/mutex", gin.WrapH(netPprof.Handler("mutex")))
+		prefixRouter.GET("/threadcreate", gin.WrapH(netPprof.Handler("threadcreate")))
 	}
 }

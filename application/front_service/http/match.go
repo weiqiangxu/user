@@ -1,9 +1,8 @@
 package http
 
 import (
-	"net/http"
-
 	"github.com/weiqiangxu/user/application/front_service/dtos"
+	"net/http"
 
 	"github.com/weiqiangxu/protocol/order"
 
@@ -40,6 +39,8 @@ func NewUserAppHttpService(options ...UserAppHttpOption) *UserAppHttpService {
 
 // GetUserList get user list
 func (m *UserAppHttpService) GetUserList(c *gin.Context) {
+	//pprof.StartCPUProfile(os.Stdout)
+	//defer pprof.StopCPUProfile()
 	info, _ := m.userDomainSrv.GetUserInfo(10)
 	dto := &dtos.UserDto{
 		Name: info.Name,

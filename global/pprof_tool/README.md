@@ -3,6 +3,7 @@
 1. 如何通过pprof查看当前程序的阻塞中的Goroutines数量，通过比对Goroutines数量判定是否有 Goroutines内存泄漏的情况
 2. 如何查看一个请求的路径下，各个执行语句部分内存、CPU消耗的占比
 3. Gin如何开启pprof，以及如何采集线上的执行指标信息
+4. 如何对一个函数获取pprof(bench mark与pprof)
 
 
 ### 如何加载线上的pprof指标
