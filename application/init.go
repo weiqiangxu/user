@@ -34,7 +34,7 @@ type adminService struct {
 
 func Init() {
 	// connect order rpc server to create order grpc client
-	OrderGrpc, err := grpc.DialInsecure(context.Background(), grpc.WithEndpoint(config.Conf.OrderGrpcConfig.Addr), grpc.WithTracing(true))
+	OrderGrpc, err := grpc.Dial(context.Background(), grpc.WithInSecure(true), grpc.WithEndpoint(config.Conf.OrderGrpcConfig.Addr), grpc.WithTracing(true))
 	if err != nil {
 		logger.Fatal(err)
 	}

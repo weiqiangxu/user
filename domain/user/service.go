@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/gogf/gf/util/gconv"
 	redisApi "github.com/weiqiangxu/common-config/cache"
 	"github.com/weiqiangxu/user/domain/user/entity"
 	"github.com/weiqiangxu/user/domain/user/repository"
@@ -38,10 +39,8 @@ func NewUserService(options ...MainLogicOption) DomainInterface {
 }
 
 func (m *MainLogic) GetUserInfo(id int) (*entity.UserDo, error) {
-	if true {
-		panic("hhh")
-	}
+	z := gconv.Map(`{"name":"jack","age":18}`)
 	return &entity.UserDo{
-		Name: "i am jack",
+		Name: gconv.String(z),
 	}, nil
 }

@@ -6,11 +6,13 @@ import (
 	"github.com/weiqiangxu/common-config/metrics"
 	"github.com/weiqiangxu/user/application"
 	"github.com/weiqiangxu/user/config"
+	"github.com/weiqiangxu/user/global/pprof"
 )
 
 func Init(r *gin.Engine) {
 	monitorHandle := metrics.RequestMonitor()
 	r.Use(monitorHandle)
+	pprof.Register(r) // register pprof to gin
 	game := r.Group("/user")
 	{
 		game.GET("/list", application.App.FrontService.UserHttp.GetUserList)
