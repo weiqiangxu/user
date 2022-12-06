@@ -55,6 +55,7 @@ cum%	cum 占 CPU 总时间的比例
 [http://127.0.0.1:8080/debug/pprof/](http://127.0.0.1:8080/debug/pprof/)
 [深度解密Go语言之 pprof](https://www.cnblogs.com/qcrao-2018/p/11832732.html)
 [实战Go内存泄露](https://segmentfault.com/a/1190000019222661)
+[Go常用包(二十九):性能调试利器使用 - 如何分析一个函数执行的详细](http://liuqh.icu/2021/11/15/go/package/29-pprof-1/)
 
 ### 一个内存泄漏的例子
 
@@ -64,4 +65,51 @@ var buf []byte
 for range tick {
     buf = append(buf, make([]byte, 1024*1024)...)
 }
+```
+
+### 超大内存占用的例子
+```
+ch := make(chan bool)
+go func() {
+    var stringSlice []string
+    for i := 0; i < 20; i++ {
+        repeat := strings.Repeat("hello,world", 50000)
+        stringSlice = append(stringSlice, repeat)
+        time.Sleep(time.Millisecond * 500)
+    }
+    ch <- true
+}()
+<-ch
+```
+
+### bench
+```
+go test -bench="Fib$" -cpuprofile=cpu.pprof .
+go tool pprof -text cpu.pprof
+```
+
+### 执行日志
+```
+➜  Documents go tool pprof 127.0.0.1:8080/debug/pprof/heap
+Fetching profile over HTTP from http://127.0.0.1:8080/debug/pprof/heap
+Saved profile in /Users/xuweiqiang/pprof/pprof.alloc_objects.alloc_space.inuse_objects.inuse_space.013.pb.gz
+Type: inuse_space
+Time: Dec 6, 2022 at 1:56pm (CST)
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) list GetUserList
+Total: 9.43MB
+ROUTINE ======================== /http/match.go
+         0     4.06MB (flat, cum) 43.04% of Total
+         .          .     45:	ch := make(chan bool)
+         .          .     46:	go func() {
+         .          .     47:		var stringSlice []string
+         .          .     48:		for i := 0; i < 20; i++ {
+         .          .     49:			// pprof 显示在这里占用2MB的内存开销
+         .     4.06MB     50:			repeat := strings.Repeat("hello,world", 50000)
+         .          .     51:			stringSlice = append(stringSlice, repeat)
+         .          .     52:			time.Sleep(time.Millisecond * 500)
+         .          .     53:		}
+         .          .     54:		ch <- true
+         .          .     55:	}()
+(pprof) 
 ```
