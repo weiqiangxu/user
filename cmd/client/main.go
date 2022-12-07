@@ -5,9 +5,7 @@ import (
 	"github.com/weiqiangxu/common-config/logger"
 	"github.com/weiqiangxu/net"
 	"github.com/weiqiangxu/net/transport"
-	"github.com/weiqiangxu/net/transport/grpc"
 	"github.com/weiqiangxu/net/transport/http"
-	"github.com/weiqiangxu/protocol/user"
 	"github.com/weiqiangxu/user/application"
 	"github.com/weiqiangxu/user/config"
 	"github.com/weiqiangxu/user/global/router"
@@ -16,17 +14,9 @@ import (
 func main() {
 	// inject config from nacos
 	config.Conf = config.Config{
-		Application: config.AppInfo{},
-		HttpConfig: format.HttpConfig{
-			ListenHTTP: ":8080",
-			Profile:    false,
-			Verbose:    false,
-			Tracing:    false,
-			Prometheus: false,
-		},
-		UserGrpcConfig: format.GrpcConfig{
-			Addr: ":8989",
-		},
+		Application:     config.AppInfo{Name: "admin", Version: "v0.0.2"},
+		HttpConfig:      format.HttpConfig{ListenHTTP: ":8989", Prometheus: true},
+		UserGrpcConfig:  format.GrpcConfig{Addr: ":9090"},
 		OrderGrpcConfig: format.GrpcConfig{},
 		LogConfig:       format.LogConfig{},
 		WikiMongoDb:     format.MongoConfig{},
@@ -44,11 +34,8 @@ func main() {
 	// mount routing and middleware to http server
 	router.Init(httpServer.Server())
 	router.RegisterPrometheus()
-	// register user grpc server
-	grpcServer := grpc.NewServer(grpc.Address(config.Conf.UserGrpcConfig.Addr))
-	user.RegisterLoginServer(grpcServer, application.App.AdminService.UserGrpcService)
 	// register http server && rpc server to gin engine and run
-	serverList := []transport.Server{httpServer, grpcServer}
+	serverList := []transport.Server{httpServer}
 	if len(application.App.Event) > 0 {
 		serverList = append(serverList, application.App.Event...)
 	}

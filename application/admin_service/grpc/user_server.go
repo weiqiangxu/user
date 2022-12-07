@@ -2,6 +2,9 @@ package grpc
 
 import (
 	"context"
+	"github.com/weiqiangxu/common-config/logger"
+	"math/rand"
+	"time"
 
 	"github.com/pkg/errors"
 	redisApi "github.com/weiqiangxu/common-config/cache"
@@ -33,6 +36,9 @@ func (srv *UserAppGrpcService) GetUserInfo(ctx context.Context, request *user.Ge
 	if request == nil {
 		return nil, errors.New("request is nil")
 	}
+	delay := rand.Intn(10)
+	time.Sleep(time.Second * time.Duration(delay))
+	logger.Infof("sleep %d second", delay)
 	return &user.GetUserInfoResponse{
 		ErrorCode: user.ERROR_CODE_SuccessCode,
 		UserInfo: &user.UserInfo{

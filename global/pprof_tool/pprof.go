@@ -1,8 +1,9 @@
 package pprof_tool
 
 import (
-	"github.com/gin-gonic/gin"
 	netPprof "net/http/pprof"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (

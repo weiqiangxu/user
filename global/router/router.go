@@ -16,6 +16,7 @@ func Init(r *gin.Engine) {
 	game := r.Group("/user")
 	{
 		game.GET("/list", application.App.FrontService.UserHttp.GetUserList)
+		game.GET("/info", application.App.FrontService.UserHttp.GetUserInfo)
 	}
 }
 

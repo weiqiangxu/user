@@ -8,7 +8,7 @@ import (
 	"github.com/weiqiangxu/common-config/logger"
 	"github.com/weiqiangxu/net/transport"
 	"github.com/weiqiangxu/net/transport/grpc"
-	"github.com/weiqiangxu/protocol/order"
+	pbUser "github.com/weiqiangxu/protocol/user"
 	adminGrpc "github.com/weiqiangxu/user/application/admin_service/grpc"
 	"github.com/weiqiangxu/user/application/event"
 	frontHttp "github.com/weiqiangxu/user/application/front_service/http"
@@ -34,18 +34,24 @@ type adminService struct {
 
 func Init() {
 	// connect order rpc server to create order grpc client
-	OrderGrpc, err := grpc.Dial(context.Background(), grpc.WithInSecure(true), grpc.WithEndpoint(config.Conf.OrderGrpcConfig.Addr), grpc.WithTracing(true))
+	userGrpcConn, err := grpc.Dial(
+		context.Background(),
+		grpc.WithInSecure(true),
+		grpc.WithEndpoint(config.Conf.UserGrpcConfig.Addr),
+		grpc.WithTracing(true),
+		grpc.WithPrometheus(true),
+	)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	orderGrpcClient := order.NewOrderClient(OrderGrpc)
+	userGrpcClient := pbUser.NewLoginClient(userGrpcConn)
 	// inject rpc client && redis into domain service
 	redis := redisApi.NewRedisApi(config.Conf.WikiRedisDb)
 	userDomain := user.NewUserService(user.WithRedis(redis))
 	frontSrv := &frontService{}
 	frontSrv.UserHttp = frontHttp.NewUserAppHttpService(
 		frontHttp.WithUserDomainService(userDomain),
-		frontHttp.WithOrderRpcClient(orderGrpcClient),
+		frontHttp.WithUserRpcClient(userGrpcClient),
 	)
 	adminSrv := &adminService{}
 	adminSrv.UserGrpcService = adminGrpc.NewUserAppGrpcService()

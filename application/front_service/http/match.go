@@ -1,12 +1,15 @@
 package http
 
 import (
-	"github.com/weiqiangxu/user/application/front_service/dtos"
+	"github.com/weiqiangxu/common-config/logger"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/weiqiangxu/user/application/front_service/dtos"
+
 	"github.com/weiqiangxu/protocol/order"
+	pbUser "github.com/weiqiangxu/protocol/user"
 
 	"github.com/gin-gonic/gin"
 	"github.com/weiqiangxu/user/domain/user"
@@ -26,9 +29,16 @@ func WithOrderRpcClient(t order.OrderClient) UserAppHttpOption {
 	}
 }
 
+func WithUserRpcClient(t pbUser.LoginClient) UserAppHttpOption {
+	return func(service *UserAppHttpService) {
+		service.userRpcClient = t
+	}
+}
+
 type UserAppHttpService struct {
 	userDomainSrv  user.DomainInterface
 	orderRpcClient order.OrderClient
+	userRpcClient  pbUser.LoginClient
 }
 
 func NewUserAppHttpService(options ...UserAppHttpOption) *UserAppHttpService {
@@ -51,6 +61,7 @@ func (m *UserAppHttpService) GetUserList(c *gin.Context) {
 			stringSlice = append(stringSlice, repeat)
 			time.Sleep(time.Millisecond * 500)
 		}
+		logger.Info(len(stringSlice))
 		ch <- true
 	}()
 	<-ch
@@ -59,4 +70,18 @@ func (m *UserAppHttpService) GetUserList(c *gin.Context) {
 		Name: info.Name,
 	}
 	c.JSON(http.StatusOK, dto)
+}
+
+// GetUserInfo get user info
+func (m *UserAppHttpService) GetUserInfo(c *gin.Context) {
+	response, err := m.userRpcClient.GetUserInfo(c.Request.Context(), &pbUser.GetUserInfoRequest{
+		UniqueId: "1",
+		NameMain: "2",
+		NameSub:  "3",
+	})
+	if err != nil {
+		c.JSON(http.StatusOK, err)
+		return
+	}
+	c.JSON(http.StatusOK, response.UserInfo)
 }
