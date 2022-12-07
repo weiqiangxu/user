@@ -334,8 +334,8 @@ github.com/ugorji/go/codec v1.2.7 h1:YPXUKf7fYbp/y8xloBqZOw2qaVggbfwMlI8WM3wZUJ0
 github.com/ugorji/go/codec v1.2.7/go.mod h1:WGN1fab3R1fzQlVQTkfxVtIBhWDRqOviHU95kRgeqEY=
 github.com/weiqiangxu/common-config v0.0.0-20221126045525-c1f355112184 h1:RzUabrmU0OUFSbAAkp2nGJYR0mshlCfNCno/wwtT2XU=
 github.com/weiqiangxu/common-config v0.0.0-20221126045525-c1f355112184/go.mod h1:MTrl0v+p9naKDlEejQdDiXrpKtgsEigoveh+Vrl8F5I=
-github.com/weiqiangxu/net v0.0.0-20221207050934-85781942e144 h1:rApIy4KFCsvV+14P7e1Em4X9laFWbeYDIphcxkKJoS4=
-github.com/weiqiangxu/net v0.0.0-20221207050934-85781942e144/go.mod h1:D2WkflUSPXwfKbYwuHhQ2FJ67QryuIb/Q0CTMZ2V/cU=
+github.com/weiqiangxu/net v0.0.0-20221207070347-1d4d123a8be0 h1:q657On68rYLz7wiKrUDC7ppkC91bI6xNU4moVaWIA00=
+github.com/weiqiangxu/net v0.0.0-20221207070347-1d4d123a8be0/go.mod h1:D2WkflUSPXwfKbYwuHhQ2FJ67QryuIb/Q0CTMZ2V/cU=
 github.com/weiqiangxu/protocol v0.0.0-20221126155733-7657bc0121fc h1:buD4YOiD41GpkSTZ8kJ6igYB/y4xfUT4enMq9LAUPs0=
 github.com/weiqiangxu/protocol v0.0.0-20221126155733-7657bc0121fc/go.mod h1:4W30wNetQqctSec9iwewhBeFA1aebL+gY78RC0fk4uI=
 github.com/xdg-go/pbkdf2 v1.0.0 h1:Su7DPu48wXMwC3bs7MCNG+z4FhcyEuz5dlvchbq0B0c=

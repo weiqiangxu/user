@@ -9,7 +9,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/weiqiangxu/common-config v0.0.0-20221126045525-c1f355112184
-	github.com/weiqiangxu/net v0.0.0-20221207050934-85781942e144
+	github.com/weiqiangxu/net v0.0.0-20221207070347-1d4d123a8be0
 	github.com/weiqiangxu/protocol v0.0.0-20221126155733-7657bc0121fc
 	go.mongodb.org/mongo-driver v1.11.0
 )

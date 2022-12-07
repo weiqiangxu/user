@@ -10,4 +10,8 @@
 
 ### 服务访问
 
-[user/info](http://localhost:8989/user/info)
+[http://localhost:8989/user/info](http://localhost:8989/user/info)
+
+### prometheus指标呈现
+
+[http://localhost:8989/metrics](http://localhost:8989/metrics)
