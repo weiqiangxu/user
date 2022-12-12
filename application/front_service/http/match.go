@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 	"github.com/weiqiangxu/common-config/logger"
 	"net/http"
 	"strings"
@@ -92,7 +93,7 @@ func (m *UserAppHttpService) GetUserInfo(c *gin.Context) {
 
 func validateStruct() error {
 	address := &dtos.AddressRequest{
-		Street: "Docks",
+		Street: "",
 		Planet: "person",
 		Phone:  "none",
 	}
@@ -104,31 +105,89 @@ func validateStruct() error {
 		Addresses: []*dtos.AddressRequest{address},
 	}
 	validate := validator.New()
+
+	e := en.New()
+	uni := ut.New(e, e)
+	trans, _ := uni.GetTranslator("en")
+	err := validate.RegisterTranslation("required", trans, func(ut ut.Translator) error {
+		return ut.Add("required", "{0} must have a value!", true) // see universal-translator for details
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("required", fe.Field())
+		return t
+	})
+	if err != nil {
+		return err
+	}
 	// returns nil or ValidationErrors ( []FieldError )
-	err := validate.Struct(u)
+	err = validate.Struct(u)
+	var errList []string
 	if err != nil {
 		// this check is only needed when your code could produce
 		// an invalid value for validation such as interface with nil
 		// value most including myself do not usually have code like this.
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			logger.Info(err)
-		}
-		for _, err := range err.(validator.ValidationErrors) {
-			logger.Info(err.Namespace())
-			logger.Info(err.Field())
-			logger.Info(err.StructNamespace())
-			logger.Info(err.StructField())
-			logger.Info(err.Tag())
-			logger.Info(err.ActualTag())
-			logger.Info(err.Kind())
-			logger.Info(err.Type())
-			logger.Info(err.Value())
-			logger.Info(err.Param())
-		}
+		//if _, ok := err.(*validator.InvalidValidationError); ok {
+		//	logger.Info(err)
+		//}
+		//for _, err := range err.(validator.ValidationErrors) {
+		//	logger.Info(err.Namespace())
+		//	logger.Info(err.Field())
+		//	logger.Info(err.StructNamespace())
+		//	logger.Info(err.StructField())
+		//	logger.Info(err.Tag())
+		//	logger.Info(err.ActualTag())
+		//	logger.Info(err.Kind())
+		//	logger.Info(err.Type())
+		//	logger.Info(err.Value())
+		//	logger.Info(err.Param())
+		//}
 		// from here you can create your own error messages in whatever language you wish
+		errs := err.(validator.ValidationErrors)
+		for _, e := range errs {
+			// can translate each error one at a time.
+			errList = append(errList, e.Translate(trans))
+		}
 	}
 	// save user to database
+	return errors.New(strings.Join(errList, ";"))
+}
+
+func ValidateInterceptor(err error) error {
+	e := en.New()
+	uni := ut.New(e, e)
+	trans, _ := uni.GetTranslator("en")
+	if list, ok := err.(validator.ValidationErrors); ok {
+		var errList []string
+		for _, v := range list {
+			errList = append(errList, v.Translate(trans))
+		}
+		err = errors.New(strings.Join(errList, ";"))
+	}
 	return err
+}
+
+func registerTranslation(v *validator.Validate) {
+	e := en.New()
+	uni := ut.New(e, e)
+	trans, _ := uni.GetTranslator("en")
+	//var trans ut.Translator
+	err := v.RegisterTranslation("required", trans, func(ut ut.Translator) error {
+		return ut.Add("required", "{0} must have a value!", true) // see universal-translator for details
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("required", fe.Field())
+		return t
+	})
+	if err != nil {
+		logger.Fatal(err)
+	}
+	err = v.RegisterTranslation("lte", trans, func(ut ut.Translator) error {
+		return ut.Add("lte", "{0} must lte {1}!", true) // see universal-translator for details
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("lte", fe.Field(), fe.Tag())
+		return t
+	})
+	if err != nil {
+		logger.Fatal(err)
+	}
 }
 
 func validateStruct2() error {
