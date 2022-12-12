@@ -2,7 +2,13 @@ package application
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"time"
+
+	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-client-go"
+	jaegerConfig "github.com/uber/jaeger-client-go/config"
 
 	redisApi "github.com/weiqiangxu/common-config/cache"
 	"github.com/weiqiangxu/common-config/logger"
@@ -22,6 +28,7 @@ type app struct {
 	FrontService *frontService
 	AdminService *adminService
 	Event        []transport.Server
+	Tracer       opentracing.Tracer
 }
 
 type frontService struct {
@@ -44,6 +51,7 @@ func Init() {
 	if err != nil {
 		logger.Fatal(err)
 	}
+	tracer, _ := InitJaeger(fmt.Sprintf("%s:%s", config.Conf.Application.Name, config.Conf.Application.Version))
 	userGrpcClient := pbUser.NewLoginClient(userGrpcConn)
 	// inject rpc client && redis into domain service
 	redis := redisApi.NewRedisApi(config.Conf.WikiRedisDb)
@@ -52,6 +60,7 @@ func Init() {
 	frontSrv.UserHttp = frontHttp.NewUserAppHttpService(
 		frontHttp.WithUserDomainService(userDomain),
 		frontHttp.WithUserRpcClient(userGrpcClient),
+		frontHttp.WithTracer(tracer),
 	)
 	adminSrv := &adminService{}
 	adminSrv.UserGrpcService = adminGrpc.NewUserAppGrpcService()
@@ -67,4 +76,25 @@ func Init() {
 	App.FrontService = frontSrv
 	App.AdminService = adminSrv
 	App.Event = []transport.Server{matchEvent}
+	App.Tracer = tracer
+}
+
+// InitJaeger returns an instance of Jaeger Tracer that samples 100% of traces and logs all spans to stdout.
+func InitJaeger(service string) (opentracing.Tracer, io.Closer) {
+	cfg := &jaegerConfig.Configuration{
+		ServiceName: service,
+		Sampler: &jaegerConfig.SamplerConfig{
+			Type:  "const",
+			Param: 1,
+		},
+		Reporter: &jaegerConfig.ReporterConfig{
+			LogSpans:          true,
+			CollectorEndpoint: config.Conf.JaegerConfig.Addr,
+		},
+	}
+	tracer, closer, err := cfg.NewTracer(jaegerConfig.Logger(jaeger.StdLogger))
+	if err != nil {
+		logger.Fatal(err)
+	}
+	return tracer, closer
 }

@@ -6,3 +6,5 @@ const (
 	Delete UserStatus = 1
 	Active UserStatus = 2
 )
+
+const TraceSpanName = "span"

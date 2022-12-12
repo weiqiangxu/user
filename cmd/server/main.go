@@ -16,7 +16,7 @@ func main() {
 	// 配置依赖注入
 	config.Conf = config.Config{
 		Application:    config.AppInfo{Name: "server", Version: "v0.0.1"},
-		UserGrpcConfig: format.GrpcConfig{Addr: ":9090"},
+		UserGrpcConfig: format.GrpcConfig{Addr: ":9191"},
 	}
 	// mongodb && redis 等服务依赖
 	application.Init()

@@ -16,7 +16,7 @@ func main() {
 	config.Conf = config.Config{
 		Application:     config.AppInfo{Name: "admin", Version: "v0.0.2"},
 		HttpConfig:      format.HttpConfig{ListenHTTP: ":8989", Prometheus: true},
-		UserGrpcConfig:  format.GrpcConfig{Addr: ":9090"},
+		UserGrpcConfig:  format.GrpcConfig{Addr: ":9191"},
 		OrderGrpcConfig: format.GrpcConfig{},
 		LogConfig:       format.LogConfig{},
 		WikiMongoDb:     format.MongoConfig{},
@@ -24,6 +24,9 @@ func main() {
 		JwtConfig: config.JwtConfig{
 			Secret:  "",
 			Timeout: 0,
+		},
+		JaegerConfig: config.JaegerConfig{
+			Addr: "http://127.0.0.1:14268/api/traces",
 		},
 	}
 	application.Init()

@@ -12,11 +12,13 @@ import (
 func Init(r *gin.Engine) {
 	monitorHandle := metrics.RequestMonitor()
 	r.Use(monitorHandle)
+	r.Use(RequestTracing())
 	pprof_tool.Register(r) // register pprof to gin
 	game := r.Group("/user")
 	{
 		game.GET("/list", application.App.FrontService.UserHttp.GetUserList)
 		game.GET("/info", application.App.FrontService.UserHttp.GetUserInfo)
+		game.GET("/detail", application.App.FrontService.UserHttp.GetUserDetail)
 	}
 }
 

@@ -2,9 +2,10 @@ package grpc
 
 import (
 	"context"
-	"github.com/weiqiangxu/common-config/logger"
 	"math/rand"
 	"time"
+
+	"github.com/weiqiangxu/common-config/logger"
 
 	"github.com/pkg/errors"
 	redisApi "github.com/weiqiangxu/common-config/cache"

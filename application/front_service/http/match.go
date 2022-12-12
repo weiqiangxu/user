@@ -2,14 +2,18 @@ package http
 
 import (
 	"fmt"
-	"github.com/go-playground/locales/en"
-	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
-	"github.com/pkg/errors"
-	"github.com/weiqiangxu/common-config/logger"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/weiqiangxu/user/global/enum"
+
+	"github.com/go-playground/locales/en"
+	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator/v10"
+	"github.com/opentracing/opentracing-go"
+	"github.com/pkg/errors"
+	"github.com/weiqiangxu/common-config/logger"
 
 	"github.com/weiqiangxu/user/application/front_service/dtos"
 
@@ -40,10 +44,17 @@ func WithUserRpcClient(t pbUser.LoginClient) UserAppHttpOption {
 	}
 }
 
+func WithTracer(t opentracing.Tracer) UserAppHttpOption {
+	return func(service *UserAppHttpService) {
+		service.trace = t
+	}
+}
+
 type UserAppHttpService struct {
 	userDomainSrv  user.DomainInterface
 	orderRpcClient order.OrderClient
 	userRpcClient  pbUser.LoginClient
+	trace          opentracing.Tracer
 }
 
 func NewUserAppHttpService(options ...UserAppHttpOption) *UserAppHttpService {
@@ -79,11 +90,16 @@ func (m *UserAppHttpService) GetUserList(c *gin.Context) {
 
 // GetUserInfo get user info
 func (m *UserAppHttpService) GetUserInfo(c *gin.Context) {
+	time.Sleep(time.Second * 2)
+	v, _ := c.Get(enum.TraceSpanName)
+	parentSpan := v.(opentracing.SpanContext)
+	child := m.trace.StartSpan("GetUserInfo", opentracing.ChildOf(parentSpan))
 	response, err := m.userRpcClient.GetUserInfo(c.Request.Context(), &pbUser.GetUserInfoRequest{
 		UniqueId: "1",
 		NameMain: "2",
 		NameSub:  "3",
 	})
+	child.Finish()
 	if err != nil {
 		c.JSON(http.StatusOK, err)
 		return
@@ -165,11 +181,11 @@ func ValidateInterceptor(err error) error {
 	return err
 }
 
-func registerTranslation(v *validator.Validate) {
+func RegisterTranslation(v *validator.Validate) {
 	e := en.New()
 	uni := ut.New(e, e)
 	trans, _ := uni.GetTranslator("en")
-	//var trans ut.Translator
+	// var trans ut.Translator
 	err := v.RegisterTranslation("required", trans, func(ut ut.Translator) error {
 		return ut.Add("required", "{0} must have a value!", true) // see universal-translator for details
 	}, func(ut ut.Translator, fe validator.FieldError) string {
@@ -194,7 +210,7 @@ func validateStruct2() error {
 	e := en.New()
 	uni := ut.New(e, e)
 	trans, _ := uni.GetTranslator("en")
-	//var trans ut.Translator
+	// var trans ut.Translator
 	validate := validator.New()
 	err := validate.RegisterTranslation("required", trans, func(ut ut.Translator) error {
 		return ut.Add("required", "{0} must have a value!", true) // see universal-translator for details
@@ -218,4 +234,10 @@ func validateStruct2() error {
 		}
 	}
 	return nil
+}
+
+// GetUserDetail get user list
+func (m *UserAppHttpService) GetUserDetail(c *gin.Context) {
+	time.Sleep(time.Second)
+	c.JSON(http.StatusOK, "hello i am jack")
 }
