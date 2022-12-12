@@ -132,36 +132,31 @@ func validateStruct() error {
 }
 
 func validateStruct2() error {
-	en := en.New()
-	uni := ut.New(en, en)
+	e := en.New()
+	uni := ut.New(e, e)
 	trans, _ := uni.GetTranslator("en")
 	//var trans ut.Translator
 	validate := validator.New()
-	validate.RegisterTranslation("required", trans, func(ut ut.Translator) error {
+	err := validate.RegisterTranslation("required", trans, func(ut ut.Translator) error {
 		return ut.Add("required", "{0} must have a value!", true) // see universal-translator for details
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, _ := ut.T("required", fe.Field())
 		return t
 	})
-	type User struct {
-		Username string `validate:"required"`
-	}
-	var user User
-
-	err := validate.Struct(user)
 	if err != nil {
-
+		return err
+	}
+	type Person struct {
+		Username string `validate:"required" json:"username"`
+	}
+	var p Person
+	err = validate.Struct(p)
+	if err != nil {
 		errs := err.(validator.ValidationErrors)
-
 		for _, e := range errs {
 			// can translate each error one at a time.
 			fmt.Println(e.Translate(trans))
 		}
 	}
-	//u := &dtos.UserRequest{
-	//	FirstName: "a",
-	//}
-	//validate := validator.New()
-	//return validate.Struct(user)
 	return nil
 }

@@ -26,7 +26,7 @@ func Test_validateStruct2(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "test",
+			name:    "验证自定义错误",
 			wantErr: false,
 		},
 	}
