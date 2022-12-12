@@ -1,6 +1,10 @@
 package http
 
 import (
+	"fmt"
+	"github.com/go-playground/locales/en"
+	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator/v10"
 	"github.com/weiqiangxu/common-config/logger"
 	"net/http"
 	"strings"
@@ -84,4 +88,80 @@ func (m *UserAppHttpService) GetUserInfo(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response.UserInfo)
+}
+
+func validateStruct() error {
+	address := &dtos.AddressRequest{
+		Street: "Docks",
+		Planet: "person",
+		Phone:  "none",
+	}
+	u := &dtos.UserInfoRequest{
+		FirstName: "a",
+		LastName:  "Smith",
+		Age:       135,
+		Email:     "Badger.Smith@gmail.com",
+		Addresses: []*dtos.AddressRequest{address},
+	}
+	validate := validator.New()
+	// returns nil or ValidationErrors ( []FieldError )
+	err := validate.Struct(u)
+	if err != nil {
+		// this check is only needed when your code could produce
+		// an invalid value for validation such as interface with nil
+		// value most including myself do not usually have code like this.
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			logger.Info(err)
+		}
+		for _, err := range err.(validator.ValidationErrors) {
+			logger.Info(err.Namespace())
+			logger.Info(err.Field())
+			logger.Info(err.StructNamespace())
+			logger.Info(err.StructField())
+			logger.Info(err.Tag())
+			logger.Info(err.ActualTag())
+			logger.Info(err.Kind())
+			logger.Info(err.Type())
+			logger.Info(err.Value())
+			logger.Info(err.Param())
+		}
+		// from here you can create your own error messages in whatever language you wish
+	}
+	// save user to database
+	return err
+}
+
+func validateStruct2() error {
+	en := en.New()
+	uni := ut.New(en, en)
+	trans, _ := uni.GetTranslator("en")
+	//var trans ut.Translator
+	validate := validator.New()
+	validate.RegisterTranslation("required", trans, func(ut ut.Translator) error {
+		return ut.Add("required", "{0} must have a value!", true) // see universal-translator for details
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("required", fe.Field())
+		return t
+	})
+	type User struct {
+		Username string `validate:"required"`
+	}
+	var user User
+
+	err := validate.Struct(user)
+	if err != nil {
+
+		errs := err.(validator.ValidationErrors)
+
+		for _, e := range errs {
+			// can translate each error one at a time.
+			fmt.Println(e.Translate(trans))
+		}
+	}
+	//u := &dtos.UserRequest{
+	//	FirstName: "a",
+	//}
+	//validate := validator.New()
+	//return validate.Struct(user)
+	return nil
 }
