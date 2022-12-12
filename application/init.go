@@ -40,6 +40,7 @@ type adminService struct {
 }
 
 func Init() {
+	tracer, _ := InitJaeger(fmt.Sprintf("%s:%s", config.Conf.Application.Name, config.Conf.Application.Version))
 	// connect order rpc server to create order grpc client
 	userGrpcConn, err := grpc.Dial(
 		context.Background(),
@@ -47,11 +48,11 @@ func Init() {
 		grpc.WithEndpoint(config.Conf.UserGrpcConfig.Addr),
 		grpc.WithTracing(true),
 		grpc.WithPrometheus(true),
+		grpc.WithUnaryTraceInterceptor(tracer),
 	)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	tracer, _ := InitJaeger(fmt.Sprintf("%s:%s", config.Conf.Application.Name, config.Conf.Application.Version))
 	userGrpcClient := pbUser.NewLoginClient(userGrpcConn)
 	// inject rpc client && redis into domain service
 	redis := redisApi.NewRedisApi(config.Conf.WikiRedisDb)

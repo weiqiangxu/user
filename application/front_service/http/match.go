@@ -1,12 +1,12 @@
 package http
 
 import (
+	"context"
 	"fmt"
+	"github.com/weiqiangxu/user/global/enum"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/weiqiangxu/user/global/enum"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -90,16 +90,14 @@ func (m *UserAppHttpService) GetUserList(c *gin.Context) {
 
 // GetUserInfo get user info
 func (m *UserAppHttpService) GetUserInfo(c *gin.Context) {
-	time.Sleep(time.Second * 2)
 	v, _ := c.Get(enum.TraceSpanName)
-	parentSpan := v.(opentracing.SpanContext)
-	child := m.trace.StartSpan("GetUserInfo", opentracing.ChildOf(parentSpan))
-	response, err := m.userRpcClient.GetUserInfo(c.Request.Context(), &pbUser.GetUserInfoRequest{
+	ctx := context.WithValue(context.Background(), "span", v)
+	response, err := m.userRpcClient.GetUserInfo(ctx, &pbUser.GetUserInfoRequest{
 		UniqueId: "1",
 		NameMain: "2",
 		NameSub:  "3",
 	})
-	child.Finish()
+	//child.Finish()
 	if err != nil {
 		c.JSON(http.StatusOK, err)
 		return
